@@ -5,7 +5,7 @@ const { body, validationResult } = require("express-validator");
 
 // create user path /api/auth
 router.post(
-	"/",
+	"/createuser",
 	[
 		body("name", "name is not valid").isLength({ min: 3 }),
 		body("email", "email is not valid").isEmail(),
@@ -18,23 +18,22 @@ router.post(
 			return res.status(400).json({ errors: errors.array() });
 		}
 		// Check wether the use with the same email already exists
-		// let user = User.findOne({ email: req.body.email });
-		// if (user) {
-		// 	return res
-		// 		.status(400)
-		// 		.json({ error: "Sorry a User with the same email already exists" });
-		// }
-		// user = await
-		User.create({
-			name: req.body.name,
-			email: req.body.email,
-			password: req.body.password,
-		})
-			.then((user) => res.json({ user, msg: "Hello G " }))
-			.catch((err) => {
-				res.json({ error: "plz enter a unique email", msg: err.message });
-				console.log(`Error Accoured: ${err}`);
+		try {
+			let user = await User.findOne({ email: req.body.email });
+			if (user) {
+				return res
+					.status(400)
+					.json({ error: "Sorry a User with the same email already exists" });
+			}
+			user = await User.create({
+				name: req.body.name,
+				email: req.body.email,
+				password: req.body.password,
 			});
+			res.status(201).json(user);
+		} catch (error) {
+			console.log(`error during ex: ${error.message}`);
+		}
 	}
 );
 
