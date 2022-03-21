@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = "usmanisgoodguy";
 
-// create user path /api/auth
+// create a user using POST method with path: /api/auth/createuser
 router.post(
 	"/createuser",
 	[
@@ -48,6 +48,41 @@ router.post(
 			// res.status(201).json(user);
 		} catch (error) {
 			console.log(`error during ex: ${error.message}`);
+		}
+	}
+);
+
+// Authenticate a user using POST method with path: /api/auth/createuser
+router.post(
+	"/login",
+	[
+		body("email", "email is not valid").isEmail(),
+		body("password", "password cannot be blanked").exists(),
+	],
+	async (req, res) => {
+		// If there are errors, return the bad requests and errors
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).json({ errors: errors.array() });
+		}
+		const { email, password } = req.body;
+		try {
+			let user = await User.findOne({ email });
+			if (!user) {
+				return res
+					.status(500)
+					.json({ error: "plz provide correct redentials" });
+			}
+			const passwordCompare = await bcrypt.compare(password, user.password);
+			if (!passwordCompare) {
+				return res
+					.status(500)
+					.json({ error: "plz provide correct redentials" });
+			}
+			const data = { user: { id: user.id } };
+			res.status(200).json({ id: data, zinda: "toni" });
+		} catch (err) {
+			res.status(500).json({ error: "internal server error" });
 		}
 	}
 );
