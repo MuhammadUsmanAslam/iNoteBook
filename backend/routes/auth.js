@@ -4,10 +4,11 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const fetchuser = require("../middleware/fetchuser");
 
 const JWT_SECRET = "usmanisgoodguy";
 
-// create a user using POST method with path: /api/auth/createuser
+//Route:1 create a user using POST method with path: /api/auth/createuser
 router.post(
 	"/createuser",
 	[
@@ -37,22 +38,16 @@ router.post(
 				email: req.body.email,
 				password: secPass,
 			});
-			const data = {
-				user: {
-					id: user.id,
-				},
-			};
-			const authToken = jwt.sign(data, JWT_SECRET);
-			res.json({ authtoken: authToken });
+
 			// console.log(authToken);
-			// res.status(201).json(user);
+			res.status(201).json(user);
 		} catch (error) {
 			console.log(`error during ex: ${error.message}`);
 		}
 	}
 );
 
-// Authenticate a user using POST method with path: /api/auth/createuser
+//Route:2 Authenticate a user using POST method with path: /api/auth/login
 router.post(
 	"/login",
 	[
@@ -80,11 +75,23 @@ router.post(
 					.json({ error: "plz provide correct redentials" });
 			}
 			const data = { user: { id: user.id } };
-			res.status(200).json({ id: data, zinda: "toni" });
+			const authToken = jwt.sign(data, JWT_SECRET);
+			res.json({ authtoken: authToken });
 		} catch (err) {
 			res.status(500).json({ error: "internal server error" });
 		}
 	}
 );
+
+//Route:3 Getting Logged In user details using POST: /api/auth/getuser  JWT
+router.post("/getuser", fetchuser, async (req, res) => {
+	try {
+		const userId = req.user.id;
+		const user = await User.findById(userId).select("-password");
+		res.send(user);
+	} catch (error) {
+		res.status(500).send("Internal server error");
+	}
+});
 
 module.exports = router;
