@@ -40,4 +40,41 @@ router.post(
 	}
 );
 
+// updating a notes using PUT on route localhost:5000/api/notes/apdatenote
+router.put("/updatenote/:id", fetchuser, async (req, res) => {
+	try {
+		const { title, description, tag } = req.body;
+		const newnote = {};
+		if (title) {
+			newnote.title = title;
+		}
+		if (description) {
+			newnote.description = description;
+		}
+		if (tag) {
+			newnote.tag = tag;
+		}
+
+		let note = await Note.findById(req.params.id);
+		if (!note) {
+			return res.status(401).send("not allowed");
+		}
+
+		if (note.user.toString() !== req.user.id) {
+			return res.status(401).send("not allowed");
+		}
+
+		note = await Note.findByIdAndUpdate(
+			req.params.id,
+			{ $set: newnote },
+			{ new: true }
+		);
+
+		// res.send("not tried 1");
+		res.send(note);
+	} catch (err) {
+		res.status(500).json({ error: "internal server error 1" });
+	}
+});
+
 module.exports = router;
