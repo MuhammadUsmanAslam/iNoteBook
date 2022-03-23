@@ -77,4 +77,25 @@ router.put("/updatenote/:id", fetchuser, async (req, res) => {
 	}
 });
 
+// deleting a notes using DELETE on route localhost:5000/api/notes/deletenote
+router.delete("/deletenote/:id", fetchuser, async (req, res) => {
+	try {
+		let note = await Note.findById(req.params.id);
+		if (!note) {
+			return res.status(401).send("not allowed");
+		}
+
+		if (note.user.toString() !== req.user.id) {
+			return res.status(401).send("not allowed");
+		}
+
+		note = await Note.findByIdAndDelete(req.params.id);
+
+		// res.send("not tried 1");
+		res.send({ msg: "deleted successs", note });
+	} catch (err) {
+		res.status(500).json({ error: "internal server error 1" });
+	}
+});
+
 module.exports = router;
