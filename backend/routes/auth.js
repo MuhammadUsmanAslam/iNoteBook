@@ -10,7 +10,7 @@ const JWT_SECRET = "usmanisgoodguy";
 
 //Route:1 create a user using POST method with path: /api/auth/createuser
 router.post(
-	"/createuser",
+	"/signup",
 	[
 		body("name", "name is not valid").isLength({ min: 3 }),
 		body("email", "email is not valid").isEmail(),
@@ -20,15 +20,16 @@ router.post(
 		// If there are errors, return the bad requests and errors
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			return res.status(400).json({ errors: errors.array() });
+			return res.status(400).json({ success: false, errors: errors.array() });
 		}
 		// Check wether the use with the same email already exists
 		try {
 			let user = await User.findOne({ email: req.body.email });
 			if (user) {
-				return res
-					.status(400)
-					.json({ error: "Sorry a User with the same email already exists" });
+				return res.status(400).json({
+					success: false,
+					error: "Sorry a User with the same email already exists",
+				});
 			}
 			const salt = await bcrypt.genSalt(10);
 			const secPass = await bcrypt.hash(req.body.password, salt);
@@ -38,9 +39,11 @@ router.post(
 				email: req.body.email,
 				password: secPass,
 			});
+			const data = { user: { id: user.id } };
+			const authToken = jwt.sign(data, JWT_SECRET);
 
 			// console.log(authToken);
-			res.status(201).json(user);
+			res.status(201).json({ success: true, authToken });
 		} catch (error) {
 			console.log(`error during ex: ${error.message}`);
 		}
@@ -58,7 +61,7 @@ router.post(
 		// If there are errors, return the bad requests and errors
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			return res.status(400).json({ errors: errors.array() });
+			return res.status(400).json({ success: false, errors: errors.array() });
 		}
 		const { email, password } = req.body;
 		try {
@@ -66,19 +69,19 @@ router.post(
 			if (!user) {
 				return res
 					.status(500)
-					.json({ error: "plz provide correct redentials" });
+					.json({ success: false, error: "plz provide correct redentials" });
 			}
 			const passwordCompare = await bcrypt.compare(password, user.password);
 			if (!passwordCompare) {
 				return res
 					.status(500)
-					.json({ error: "plz provide correct redentials" });
+					.json({ success: false, error: "plz provide correct redentials" });
 			}
 			const data = { user: { id: user.id } };
 			const authToken = jwt.sign(data, JWT_SECRET);
-			res.json({ authtoken: authToken });
+			res.status(200).json({ success: true, authtoken: authToken });
 		} catch (err) {
-			res.status(500).json({ error: "internal server error" });
+			res.status(500).json({ success: false, error: "internal server error" });
 		}
 	}
 );
