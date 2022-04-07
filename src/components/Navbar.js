@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useHistory, useLocation } from "react-router-dom";
 
-function Navbar() {
+function Navbar({ showAlert }) {
 	const location = useLocation();
 	const history = useHistory();
 	let token = localStorage.getItem("auth-token");
@@ -56,6 +56,7 @@ function Navbar() {
 					onClick={() => {
 						localStorage.clear();
 						history.push("/login");
+						showAlert("Logout Success", "success");
 					}}
 				>
 					Logout

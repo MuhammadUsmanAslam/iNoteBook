@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import React, { useState } from "react";
 import NoteContext from "./NoteContext";
 
 const NoteState = (props) => {
@@ -14,7 +13,6 @@ const NoteState = (props) => {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
-
 				"auth-token": authToken,
 			},
 		});
@@ -25,11 +23,12 @@ const NoteState = (props) => {
 
 	// Adding a new note
 	const addNote = async (title, description, tag) => {
+		let authToken = localStorage.getItem("auth-token");
 		let response = await fetch(`${BASE_URL}/api/notes/addnote`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"auth-token": localStorage.getItem("auth-token"),
+				"auth-token": authToken,
 			},
 			body: JSON.stringify({
 				title: title,
@@ -44,12 +43,12 @@ const NoteState = (props) => {
 
 	// Deleting a Note with Click
 	const deleteNote = async (id) => {
+		let authToken = localStorage.getItem("auth-token");
 		let response = await fetch(`${BASE_URL}/api/notes/deletenote/${id}`, {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
-				"auth-token":
-					"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjIzYTQ5NjNiZmZiZWM5YjRmOTVlMjRjIn0sImlhdCI6MTY0OTAwNjUzMH0.1Cx3fdYqUPQQW_F7HrjPnFnzUSTtfYH3AyPA16jv3FA",
+				"auth-token": authToken,
 			},
 		});
 		let responseData = await response.json();
@@ -61,13 +60,13 @@ const NoteState = (props) => {
 		);
 	};
 	const editNote = async (id, title, description, tag) => {
+		let authToken = localStorage.getItem("auth-token");
 		// These lines Updates/Edits note from backend -- Starts Here
 		let response = await fetch(`${BASE_URL}/api/notes/updatenote/${id}`, {
 			method: "PUT",
 			headers: {
 				"Content-Type": "application/json",
-				"auth-token":
-					"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjIzYTQ5NjNiZmZiZWM5YjRmOTVlMjRjIn0sImlhdCI6MTY0OTAwNjUzMH0.1Cx3fdYqUPQQW_F7HrjPnFnzUSTtfYH3AyPA16jv3FA",
+				"auth-token": authToken,
 			},
 			body: JSON.stringify({ title, description, tag }),
 		});

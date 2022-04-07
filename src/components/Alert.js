@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 
-const Alert = ({ msg, type }) => {
+const Alert = ({ alert }) => {
+	useEffect(() => {
+		//   first
+
+		return () => {
+			// second
+		};
+	}, [alert.msg, alert.type]);
+
 	return (
-		<div className="alert alert-primary" role="alert">
-			{msg}
+		<div className={`alert alert-${alert.type}`} role="alert">
+			{alert.msg}
 		</div>
 	);
 };

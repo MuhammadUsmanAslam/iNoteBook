@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 
-const Signup = () => {
+const Signup = ({ showAlert }) => {
 	const history = useHistory();
 	const [signup, setSignup] = useState({ name: "", email: "", password: "" });
 
@@ -27,6 +27,9 @@ const Signup = () => {
 		if (responseData.success === true) {
 			localStorage.setItem("auth-token", responseData.authToken);
 			history.push("/");
+			showAlert("Sigup Success", "success");
+		} else {
+			showAlert(responseData.error, "danger");
 		}
 	};
 	return (

@@ -68,13 +68,13 @@ router.post(
 			let user = await User.findOne({ email });
 			if (!user) {
 				return res
-					.status(500)
+					.status(401)
 					.json({ success: false, error: "plz provide correct redentials" });
 			}
 			const passwordCompare = await bcrypt.compare(password, user.password);
 			if (!passwordCompare) {
 				return res
-					.status(500)
+					.status(401)
 					.json({ success: false, error: "plz provide correct redentials" });
 			}
 			const data = { user: { id: user.id } };

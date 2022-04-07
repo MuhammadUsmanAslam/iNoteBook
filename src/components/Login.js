@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
-const Login = () => {
+const Login = ({ showAlert }) => {
 	const history = useHistory();
 	const [login, setLogin] = useState({ email: "", password: "" });
 
@@ -11,6 +11,7 @@ const Login = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+
 		let response = await fetch(`http://localhost:5000/api/auth/login`, {
 			method: "POST",
 			headers: {
@@ -24,9 +25,12 @@ const Login = () => {
 		let responseData = await response.json();
 		if (responseData.success === true) {
 			localStorage.setItem("auth-token", responseData.authtoken);
-			console.log(responseData.authtoken);
+			// console.log(responseData.authtoken);
 
 			history.push("/");
+			showAlert("Login Success", "success");
+		} else {
+			showAlert(responseData.error, "danger");
 		}
 	};
 	return (

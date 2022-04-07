@@ -15,14 +15,14 @@ function App() {
 		setAlert({ msg: msg, type: type });
 		setTimeout(() => {
 			setAlert(null);
-		}, 1500);
+		}, 7500);
 	};
 	return (
 		<div className="app">
 			<NoteState>
 				<Router>
-					<Navbar />
-					<Alert />
+					<Navbar showAlert={showAlert} />
+					{alert && <Alert alert={alert} />}
 					<Switch>
 						<Route exact path="/">
 							<Home />
@@ -31,10 +31,10 @@ function App() {
 							<About />
 						</Route>
 						<Route exact path="/login">
-							<Login />
+							<Login showAlert={showAlert} />
 						</Route>
 						<Route exact path="/signup">
-							<Signup />
+							<Signup showAlert={showAlert} />
 						</Route>
 					</Switch>
 				</Router>
